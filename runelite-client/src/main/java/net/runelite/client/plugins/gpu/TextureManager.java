@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Texture;
 import net.runelite.api.TextureProvider;
+import net.runelite.client.config.ConfigManager;
 
 @Singleton
 @Slf4j
@@ -40,7 +41,7 @@ class TextureManager
 
 	private static final int TEXTURE_SIZE = 128;
 
-	int initTextureArray(TextureProvider textureProvider, GL4 gl)
+	int initTextureArray(TextureProvider textureProvider, GL4 gl, boolean textureCompression)
 	{
 		if (!allTexturesLoaded(textureProvider))
 		{
@@ -51,7 +52,15 @@ class TextureManager
 
 		int textureArrayId = GLUtil.glGenTexture(gl);
 		gl.glBindTexture(gl.GL_TEXTURE_2D_ARRAY, textureArrayId);
-		gl.glTexStorage3D(gl.GL_TEXTURE_2D_ARRAY, 1, gl.GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, textures.length);
+
+		if (textureCompression && gl.isExtensionAvailable("GL_EXT_texture_compression_s3tc"))
+		{
+			gl.glTexStorage3D(gl.GL_TEXTURE_2D_ARRAY, 1, gl.GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, TEXTURE_SIZE, TEXTURE_SIZE, textures.length);
+		}
+		else
+		{
+			gl.glTexStorage3D(gl.GL_TEXTURE_2D_ARRAY, 1, gl.GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, textures.length);
+		}
 
 		gl.glTexParameteri(gl.GL_TEXTURE_2D_ARRAY, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST);
 		gl.glTexParameteri(gl.GL_TEXTURE_2D_ARRAY, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST);

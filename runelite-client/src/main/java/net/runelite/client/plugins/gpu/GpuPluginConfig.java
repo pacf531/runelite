@@ -84,4 +84,15 @@ public interface GpuPluginConfig extends Config
 	{
 		return 0;
 	}
+
+	@ConfigItem(
+		keyName = "textureCompression",
+		name = "Texture Compression",
+		description = "Compresses textures to save video memory for small image quality loss. Client restart needed.",
+		position = 5
+	)
+	default boolean textureCompression()
+	{
+		return false;
+	}
 }
